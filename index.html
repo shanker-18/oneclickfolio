@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- Primary Meta Tags -->
+    <title>OneClick Folio - Premium AI-Powered Portfolio Builder</title>
+    <meta name="title" content="OneClick Folio - Premium AI-Powered Portfolio Builder" />
+    <meta name="description" content="Transform your resume into a stunning professional portfolio with AI-powered extraction and premium design templates. Create, customize, and publish your portfolio in minutes." />
+    <meta name="keywords" content="portfolio builder, resume to portfolio, AI portfolio, professional portfolio, portfolio creator, portfolio template, resume builder" />
+    <meta name="author" content="OneClick Folio" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="theme-color" content="#0284c7" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://oneclickfolio.com/" />
+    <meta property="og:title" content="OneClick Folio - Premium AI-Powered Portfolio Builder" />
+    <meta property="og:description" content="Transform your resume into a stunning professional portfolio with AI-powered extraction and premium design templates." />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:site_name" content="OneClick Folio" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://oneclickfolio.com/" />
+    <meta property="twitter:title" content="OneClick Folio - Premium AI-Powered Portfolio Builder" />
+    <meta property="twitter:description" content="Transform your resume into a stunning professional portfolio with AI-powered extraction and premium design templates." />
+    <meta property="twitter:image" content="/twitter-image.jpg" />
+    <meta name="twitter:creator" content="@oneclickfolio" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230284c7'/><text x='50' y='65' text-anchor='middle' fill='white' font-size='40' font-family='Arial, sans-serif' font-weight='bold'>OF</text></svg>" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Performance Optimization -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Security -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    
+    <!-- PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="OneClick Folio" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "OneClick Folio",
+      "description": "Premium AI-powered portfolio builder that transforms resumes into stunning professional portfolios",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "AI-powered resume extraction",
+        "Professional portfolio templates",
+        "Drag and drop interface",
+        "Real-time preview",
+        "Mobile responsive design",
+        "SEO optimized portfolios"
+      ]
+    }
+    </script>
+    
+    <!-- Prevent FOUC (Flash of Unstyled Content) -->
+    <style>
+      /* Premium Loading Screen */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0284c7 0%, #a21caf 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+      
+      #initial-loader.hide {
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      .loader-content {
+        text-align: center;
+        color: white;
+      }
+      
+      .loader-logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 800;
+        backdrop-filter: blur(10px);
+        animation: premium-pulse 2s ease-in-out infinite;
+      }
+      
+      .loader-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      
+      .loader-tagline {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.875rem;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+      
+      @keyframes premium-pulse {
+        0%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      
+      /* Hide scrollbar during loading */
+      body.loading {
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body class="loading">
+    <!-- Premium Loading Screen -->
+    <div id="initial-loader">
+      <div class="loader-content">
+        <div class="loader-logo">OF</div>
+        <div class="loader-text">OneClick Folio</div>
+        <div class="loader-tagline">Premium Portfolio Builder</div>
+      </div>
+    </div>
+    
+    <!-- Main App -->
+    <div id="root"></div>
+    
+    <!-- Remove loading screen and show app -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          const loader = document.getElementById('initial-loader');
+          const body = document.body;
+          
+          if (loader) {
+            loader.classList.add('hide');
+            body.classList.remove('loading');
+            
+            // Remove loader from DOM after animation
+            setTimeout(() => {
+              if (loader && loader.parentNode) {
+                loader.parentNode.removeChild(loader);
+              }
+            }, 500);
+          }
+        }, 1000); // Show loading for at least 1 second for premium feel
+      });
+    </script>
+    
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
