@@ -7,8 +7,9 @@ console.log('Environment MODE:', import.meta.env.MODE);
 console.log('Is Development:', isDevelopment);
 console.log('Is Production:', isProduction);
 
-// Use deployed API URL in production
-export const API_BASE_URL = isProduction ? 'https://giri-portfolio-generator-f9kr7o05e-giris-projects-75c3dbe7.vercel.app' : 'http://localhost:5000';
+// In production, use same-origin so the frontend talks to its own backend (/api)
+// In development, point to local API server
+export const API_BASE_URL = isProduction ? '' : 'http://localhost:5000';
 
 console.log('Selected API_BASE_URL:', API_BASE_URL);
 

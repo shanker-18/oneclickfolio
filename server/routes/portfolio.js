@@ -159,9 +159,15 @@ ${resumeText}
 
 Return only valid JSON, no additional text or formatting. Extract as much detail as possible from the resume text.`;
 
-    const result = await geminiAI.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text().trim();
+    let text = '';
+    try {
+      const result = await geminiAI.generateContent(prompt);
+      const response = await result.response;
+      text = response.text().trim();
+    } catch (aiErr) {
+      console.warn('⚠️ AI generation failed, proceeding with deterministic fallback:', aiErr.message);
+      text = '';
+    }
 
     // Clean up the response to ensure it's valid JSON
     const sanitizeAiJson = (raw) => {
@@ -186,11 +192,36 @@ Return only valid JSON, no additional text or formatting. Extract as much detail
 
     let resumeData = {};
     try {
-      const cleaned = sanitizeAiJson(text);
-      resumeData = JSON.parse(cleaned);
+      if (text && text.length > 0) {
+        const cleaned = sanitizeAiJson(text);
+        resumeData = JSON.parse(cleaned);
+      } else {
+        throw new Error('Empty AI response');
+      }
     } catch (e) {
-      console.warn('⚠️ AI returned invalid JSON. Using minimal fallback contact extraction.');
-      resumeData = { header: { contacts: extractFallbackContacts(resumeText), skills: [] }, summary: '', workExperience: [], education: [] };
+      console.warn('⚠️ AI output unusable. Using deterministic fallback extraction.');
+      const contacts = extractFallbackContacts(resumeText);
+      const linkAnalysis = linkExtractor.extractAndCategorizeLinks(resumeText);
+      resumeData = {
+        header: {
+          name: '',
+          shortAbout: '',
+          location: '',
+          contacts: {
+            website: linkAnalysis.contacts.website || contacts.website || '',
+            email: contacts.email || linkAnalysis.contacts.email || '',
+            phone: contacts.phone || linkAnalysis.contacts.phone || '',
+            twitter: linkAnalysis.contacts.twitter || '',
+            linkedin: linkAnalysis.contacts.linkedin || '',
+            github: linkAnalysis.contacts.github || ''
+          },
+          skills: []
+        },
+        summary: '',
+        workExperience: [],
+        education: [],
+        extraSections: []
+      };
     }
 
     // Refine/normalize for consistent quality
@@ -635,6 +666,29 @@ router.delete('/user/:sessionId/portfolio/:portfolioId', async (req, res) => {
       message: 'Failed to delete portfolio',
       error: error.message
     });
+  }
+});
+
+// Lightweight test endpoint to verify PDF extraction (text + hyperlinks)
+router.post('/test-pdf', pdfUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No PDF file uploaded' });
+    }
+    const pdfData = await pdfProcessor.extractTextFromPDF(req.file.buffer);
+    const resumeText = typeof pdfData === 'string' ? pdfData : (pdfData?.text || '');
+    const hyperlinks = Array.isArray(pdfData?.hyperlinks) ? pdfData.hyperlinks : [];
+    return res.json({
+      success: true,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
+      extractedTextLength: resumeText.length,
+      extractedTextPreview: resumeText.substring(0, 500),
+      linksFound: hyperlinks.map(h => h.url)
+    });
+  } catch (error) {
+    console.error('❌ Test PDF extraction error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to extract from PDF', error: error.message });
   }
 });
 

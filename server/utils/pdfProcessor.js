@@ -62,8 +62,15 @@ class PDFProcessor {
           const hyperlinkData = await this.extractWithPdf2jsonAndHyperlinks(buffer);
           result = {
             text: this.cleanExtractedText(data.text.trim()),
-            hyperlinks: hyperlinkData.hyperlinks
+            hyperlinks: Array.isArray(hyperlinkData.hyperlinks) ? hyperlinkData.hyperlinks : []
           };
+          // Fallback: detect visible URLs in text if annotation links missing
+          if (!result.hyperlinks || result.hyperlinks.length === 0) {
+            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+            const urls = (result.text.match(urlRegex) || []).map(u => u.replace(/[\.,]$/, ''));
+            const unique = [...new Set(urls.map(u => (u.startsWith('www.') ? `https://${u}` : u)))];
+            result.hyperlinks = unique.map(u => ({ url: u, page: null, position: null }));
+          }
           console.log('🔗 Found', result.hyperlinks.length, 'hyperlinks');
           return result;
         }
@@ -96,7 +103,35 @@ class PDFProcessor {
         result.text = ocrText;
       }
 
+      // Final hyperlink augmentation before returning
+      // 1) Try pdf-lib annotations if none found so far
+      try {
+        if (!result.hyperlinks || result.hyperlinks.length === 0) {
+          const annLinks = await this.extractHyperlinksWithPdfLib(buffer);
+          if (Array.isArray(annLinks) && annLinks.length > 0) {
+            result.hyperlinks = annLinks;
+          }
+        }
+      } catch (e) {
+        console.warn('⚠️ pdf-lib link augmentation skipped:', e.message);
+      }
+      // 2) If still none, scan visible text for URLs
+      if ((!result.hyperlinks || result.hyperlinks.length === 0) && result.text && result.text.length > 0) {
+        const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+        const urls = (result.text.match(urlRegex) || []).map(u => u.replace(/[\.,]$/, ''));
+        const unique = [...new Set(urls.map(u => (u.startsWith('www.') ? `https://${u}` : u)))];
+        result.hyperlinks = unique.map(u => ({ url: u, page: null, position: null }));
+      }
+      // 3) As last resort, scan raw buffer bytes for ASCII URLs
+      if (!result.hyperlinks || result.hyperlinks.length === 0) {
+        const bufUrls = this.extractUrlsFromBuffer(buffer);
+        if (bufUrls.length > 0) {
+          result.hyperlinks = bufUrls.map(u => ({ url: u, page: null, position: null }));
+        }
+      }
+
       result.text = this.cleanExtractedText(result.text);
+      console.log('🔗 Found', Array.isArray(result.hyperlinks) ? result.hyperlinks.length : 0, 'hyperlinks');
       return result;
     } catch (error) {
       console.error('❌ PDF processing error:', error);
@@ -186,23 +221,47 @@ class PDFProcessor {
             const epsilon = 0.5; // y-coordinate tolerance to group same line
             let currentTextLength = pageTexts.join('\n\n').length + (pageIndex > 0 ? 2 : 0); // Track position in final text
 
-            // Extract hyperlinks from this page
+            // Extract hyperlinks from this page (multiple strategies)
             const links = Array.isArray(page.Links) ? page.Links : [];
+            const pushLink = (rawUrl, extra = {}) => {
+              if (!rawUrl || typeof rawUrl !== 'string') return;
+              const url = decodeURIComponent(rawUrl).trim();
+              if (!url) return;
+              const linkData = {
+                url,
+                page: pageIndex + 1,
+                x: extra.x || 0,
+                y: extra.y || 0,
+                width: extra.w || 0,
+                height: extra.h || 0,
+                position: null // Will be calculated after text positioning
+              };
+              hyperlinks.push(linkData);
+            };
             links.forEach(link => {
               if (link.uri || link.url) {
-                const url = link.uri || link.url;
-                const linkData = {
-                  url: decodeURIComponent(url),
-                  page: pageIndex + 1,
-                  x: link.x || 0,
-                  y: link.y || 0,
-                  width: link.w || 0,
-                  height: link.h || 0,
-                  position: null // Will be calculated after text positioning
-                };
-                hyperlinks.push(linkData);
+                pushLink(link.uri || link.url, link);
               }
             });
+
+            // Fallback: inspect common annotation containers (Annots / Annotations)
+            const annotArrays = [];
+            if (Array.isArray(page.Annots)) annotArrays.push(page.Annots);
+            if (Array.isArray(page.Annotations)) annotArrays.push(page.Annotations);
+            const visit = (obj) => {
+              if (!obj || typeof obj !== 'object') return;
+              for (const [k, v] of Object.entries(obj)) {
+                if (k.toLowerCase() === 'uri' && typeof v === 'string') pushLink(v, obj);
+                // PDF annotation dict sometimes at key 'A' with field 'URI'
+                if (k === 'A' && v && typeof v === 'object' && typeof v.URI === 'string') pushLink(v.URI, obj);
+                if (v && typeof v === 'object') visit(v);
+                if (Array.isArray(v)) v.forEach(visit);
+              }
+            };
+            annotArrays.forEach(arr => arr.forEach(visit));
+
+            // As last resort, deep scan entire page object for any URI-like fields
+            visit(page);
 
             // Process text elements and track their positions
             const texts = Array.isArray(page.Texts) ? page.Texts : [];
@@ -673,6 +732,23 @@ class PDFProcessor {
     } catch (error) {
       console.error('❌ OCR extraction error:', error);
       return '';
+    }
+  }
+
+  extractUrlsFromBuffer(buffer) {
+    try {
+      // Convert to latin1 string to preserve bytes 0x00-0xFF without utf8 decoding issues
+      const ascii = buffer.toString('latin1');
+      const regex = /(?:https?:\/\/|www\.)[\w\-._~:\/?#\[\]@!$&'()*+,;=%]+/gi;
+      const raw = ascii.match(regex) || [];
+      const cleaned = raw.map(u => {
+        // Trim at first whitespace/newline/control char
+        return u.split(/[\s\x00-\x1F]/)[0].replace(/[)>\]\}]+$/, '');
+      });
+      const unique = [...new Set(cleaned.map(u => (u.startsWith('www.') ? `https://${u}` : u)))];
+      return unique;
+    } catch {
+      return [];
     }
   }
 

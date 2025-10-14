@@ -23,3 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+.vercel
+
+# Server secrets and uploads
+server/.env
+server/uploads/
+
+# Ignore accidental nested copy of this repo
+Resume-dev/
