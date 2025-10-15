@@ -20,8 +20,11 @@ const PortfolioDisplay = ({ portfolio: propPortfolio, onEdit, onDelete, onDuplic
     const [isPublished, setIsPublished] = useState(portfolio?.isPublished || false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-    const [currentTemplate, setCurrentTemplate] = useState(portfolio?.templateKey || 'modern');
-    const [currentTheme, setCurrentTheme] = useState(portfolio?.themeKey || 'indigoPurple');
+    // Persist UI choices locally so the view doesn't "jump" after data fetch
+    const storedTemplate = typeof window !== 'undefined' ? localStorage.getItem('pf_template') : null;
+    const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('pf_theme') : null;
+    const [currentTemplate, setCurrentTemplate] = useState(storedTemplate || portfolio?.templateKey || 'modern');
+    const [currentTheme, setCurrentTheme] = useState(storedTheme || portfolio?.themeKey || 'indigoPurple');
     const fileInputRef = useRef(null);
 
     // Local edit state
@@ -62,8 +65,11 @@ const PortfolioDisplay = ({ portfolio: propPortfolio, onEdit, onDelete, onDuplic
             if (response.success && response.portfolio) {
                 setPortfolio(response.portfolio);
                 setIsPublished(response.portfolio.isPublished);
-                setCurrentTemplate(response.portfolio.templateKey || 'modern');
-                setCurrentTheme(response.portfolio.themeKey || 'indigoPurple');
+                // Prefer locally stored UI choices to avoid flicker after a fetch
+                const nextTemplate = (typeof window !== 'undefined' && localStorage.getItem('pf_template')) || response.portfolio.templateKey || 'modern';
+                const nextTheme = (typeof window !== 'undefined' && localStorage.getItem('pf_theme')) || response.portfolio.themeKey || 'indigoPurple';
+                setCurrentTemplate(nextTemplate);
+                setCurrentTheme(nextTheme);
             } else {
                     setError('Portfolio not found');
                 }
@@ -105,9 +111,14 @@ const PortfolioDisplay = ({ portfolio: propPortfolio, onEdit, onDelete, onDuplic
                 })) : []
             });
         };
-        // Update local template/theme states when portfolio changes
-        setCurrentTemplate(portfolio?.templateKey || 'modern');
-        setCurrentTheme(portfolio?.themeKey || 'indigoPurple');
+        // Update local template/theme states when portfolio changes, but do not
+        // override current user preference stored in localStorage
+        if (!localStorage.getItem('pf_template') && portfolio?.templateKey) {
+            setCurrentTemplate(portfolio.templateKey);
+        }
+        if (!localStorage.getItem('pf_theme') && portfolio?.themeKey) {
+            setCurrentTheme(portfolio.themeKey);
+        }
     }, [portfolio]);
 
     const handleStartEdit = () => {
@@ -365,6 +376,8 @@ const PortfolioDisplay = ({ portfolio: propPortfolio, onEdit, onDelete, onDuplic
             const response = await portfolioService.updatePortfolio(user.sessionId, portfolio._id, { templateKey });
             if (response.success) {
                 setCurrentTemplate(templateKey);
+                // Persist choice to prevent visual jump on refresh
+                try { localStorage.setItem('pf_template', templateKey); } catch {}
                 setPortfolio({ ...portfolio, templateKey });
                 console.log('Template updated to:', templateKey);
             }
@@ -397,6 +410,8 @@ const PortfolioDisplay = ({ portfolio: propPortfolio, onEdit, onDelete, onDuplic
             if (response.success) {
                 // Force a complete portfolio state update to trigger re-render
                 setPortfolio(prevPortfolio => ({ ...prevPortfolio, themeKey }));
+                // Persist choice to prevent visual jump on refresh
+                try { localStorage.setItem('pf_theme', themeKey); } catch {}
                 console.log('✅ Theme successfully updated to:', themeKey);
             } else {
                 console.error('❌ API returned unsuccessful response:', response);

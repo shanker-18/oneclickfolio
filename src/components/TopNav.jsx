@@ -53,7 +53,7 @@ const TopNav = ({ currentTheme, onThemeChange, theme: colorMode, selectedTemplat
           <div className="relative">
             <button
               onClick={toggleTemplateDropdown}
-              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors duration-200"
               title="Choose Template"
             >
               <FaLayerGroup className="text-lg" />
@@ -109,7 +109,7 @@ const TopNav = ({ currentTheme, onThemeChange, theme: colorMode, selectedTemplat
           <div className="relative">
             <button
               onClick={toggleThemeDropdown}
-              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors duration-200"
               title="Choose Theme"
             >
               <FaPalette className="text-lg" />
