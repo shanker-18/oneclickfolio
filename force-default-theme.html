@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Emergency Theme Fix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            background: white;
+            color: #333;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+        }
+        .button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .button:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .success {
+            color: #16a34a;
+            margin-top: 1.5rem;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+        .instructions {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Emergency Theme Fix</h1>
+        <p>This will <strong>FORCE</strong> your portfolio to use the default clean theme and prevent any switching.</p>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This is an aggressive fix that will override all theme settings and lock your portfolio to the default clean theme.
+        </div>
+
+        <button class="button" onclick="forceDefaultTheme()">🔧 FORCE DEFAULT THEME</button>
+        
+        <div id="result"></div>
+        
+        <div class="instructions">
+            <h3>📋 What this does:</h3>
+            <ol>
+                <li>Clears ALL theme-related data</li>
+                <li>Forces the default theme with white background</li>
+                <li>Locks the theme for 24 hours to prevent switching</li>
+                <li>Adds emergency override flags</li>
+                <li>Injects CSS to ensure white background</li>
+            </ol>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 After clicking the button:</h3>
+            <ol>
+                <li>Go to your portfolio</li>
+                <li>Refresh the page (Ctrl+F5)</li>
+                <li>You should see STABLE white background with colorful headers</li>
+                <li>Theme will NOT switch for 24 hours</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function forceDefaultTheme() {
+            try {
+                console.log('🚨 EMERGENCY THEME FIX - FORCING DEFAULT THEME');
+                
+                // Clear everything
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Set emergency override
+                localStorage.setItem('EMERGENCY_THEME_OVERRIDE', 'true');
+                localStorage.setItem('FORCE_DEFAULT_THEME', 'true');
+                
+                // Lock theme for 24 hours
+                const lockUntil = new Date();
+                lockUntil.setHours(lockUntil.getHours() + 24);
+                localStorage.setItem('portfolio-theme-locked', 'default');
+                localStorage.setItem('theme-lock-until', lockUntil.getTime().toString());
+                
+                // Force default configuration
+                const defaultConfig = {
+                    theme: 'default',
+                    mode: 'light',
+                    template: 'modern',
+                    timestamp: Date.now(),
+                    isRandomlyAssigned: false,
+                    isFirstTime: false,
+                    isLocked: true,
+                    emergencyOverride: true
+                };
+                
+                localStorage.setItem('portfolio-theme-preferences', JSON.stringify(defaultConfig));
+                localStorage.setItem('portfolio-user-initialized', 'true');
+                
+                // Inject emergency CSS to force white background
+                const emergencyCSS = `
+                    body, html, #root, .min-h-screen { 
+                        background: white !important; 
+                        background-color: white !important;
+                    }
+                    .portfolio-header {
+                        background: linear-gradient(135deg, #2563eb, #7c3aed, #2563eb) !important;
+                    }
+                    [class*="bg-gradient"] {
+                        background: linear-gradient(135deg, #2563eb, #7c3aed, #2563eb) !important;
+                    }
+                `;
+                
+                const styleElement = document.createElement('style');
+                styleElement.innerHTML = emergencyCSS;
+                document.head.appendChild(styleElement);
+                
+                localStorage.setItem('emergency-css', emergencyCSS);
+                
+                document.getElementById('result').innerHTML = 
+                    '<div class="success">✅ EMERGENCY FIX APPLIED!<br><br>🔄 Go to your portfolio and refresh (Ctrl+F5)<br><br>Your theme is now LOCKED to default for 24 hours.</div>';
+                    
+                console.log('🔒 Theme locked until:', new Date(lockUntil));
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<div style="color: #dc2626;">❌ Error: ' + error.message + '</div>';
+                console.error('Emergency fix failed:', error);
+            }
+        }
+
+        // Check current status on load
+        window.addEventListener('load', () => {
+            const override = localStorage.getItem('EMERGENCY_THEME_OVERRIDE');
+            const lockUntil = localStorage.getItem('theme-lock-until');
+            
+            if (override) {
+                const lockTime = lockUntil ? new Date(parseInt(lockUntil)) : 'unknown';
+                document.getElementById('result').innerHTML = 
+                    '<div style="color: #16a34a;">ℹ️ Emergency override is already active.<br>Locked until: ' + (lockTime === 'unknown' ? 'unknown' : lockTime.toLocaleString()) + '</div>';
+            }
+        });
+    </script>
+</body>
+</html>

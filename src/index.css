@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Theme Transition Styles */
+.portfolio-header {
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.portfolio-header.theme-updating {
+  opacity: 0.8;
+  transform: scale(0.99);
+}
+
+/* Ensure gradient updates are smooth */
+[class*="bg-gradient"] {
+  transition: background-image 0.5s ease-in-out, background 0.5s ease-in-out;
+}
+
+/* Theme-specific overrides */
+[data-theme="default"] .portfolio-header {
+  background: white !important;
+  color: #1f2937 !important;
+}
+
+[data-theme="default"].mode-dark .portfolio-header,
+body.mode-dark [data-theme="default"] .portfolio-header {
+  background: #111827 !important;
+  color: white !important;
+}
+
+[data-theme="sapphire"] .portfolio-header {
+  background: linear-gradient(135deg, #1e40af, #4338ca, #1e3a8a) !important;
+}
+
+[data-theme="emerald"] .portfolio-header {
+  background: linear-gradient(135deg, #059669, #047857, #065f46) !important;
+}
+
+[data-theme="sunset"] .portfolio-header {
+  background: linear-gradient(135deg, #ea580c, #dc2626, #b91c1c) !important;
+}
+
+[data-theme="royal"] .portfolio-header {
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #8b5cf6) !important;
+}
+
+[data-theme="aurora"] .portfolio-header {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899) !important;
+}
+
+[data-theme="midnight"] .portfolio-header {
+  background: linear-gradient(135deg, #1e293b, #0f172a, #020617) !important;
+}
+
+[data-theme="coral"] .portfolio-header {
+  background: linear-gradient(135deg, #f97316, #ea580c, #dc2626) !important;
+}
+
+[data-theme="obsidian"] .portfolio-header {
+  background: linear-gradient(135deg, #374151, #111827, #030712) !important;
+}
+
+[data-theme="cherry"] .portfolio-header {
+  background: linear-gradient(135deg, #ec4899, #be185d, #9d174d) !important;
+}

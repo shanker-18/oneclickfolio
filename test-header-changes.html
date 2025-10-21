@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Header Theme Change Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .test-header {
+            background: linear-gradient(135deg, #2563eb, #7c3aed, #2563eb);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 20px 0;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+        .test-header[data-theme="sapphire"] {
+            background: linear-gradient(135deg, #1e40af, #4338ca, #1e3a8a) !important;
+        }
+        .test-header[data-theme="emerald"] {
+            background: linear-gradient(135deg, #059669, #047857, #065f46) !important;
+        }
+        .test-header[data-theme="sunset"] {
+            background: linear-gradient(135deg, #ea580c, #dc2626, #b91c1c) !important;
+        }
+        .test-header[data-theme="royal"] {
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #8b5cf6) !important;
+        }
+        .test-header[data-theme="aurora"] {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899) !important;
+        }
+        .theme-button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .theme-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .current-theme {
+            background: #10b981;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: white;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .log {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Header Theme Change Test</h1>
+        <p>This page tests whether header gradients change properly when themes are switched.</p>
+        
+        <div class="status">
+            <strong>📋 Instructions:</strong>
+            <ol>
+                <li>Click different theme buttons below</li>
+                <li>Watch the header gradient change</li>
+                <li>Check the console log for debug info</li>
+                <li>If header changes smoothly, theme system is working! ✅</li>
+            </ol>
+        </div>
+
+        <div class="test-header portfolio-header" id="test-header" data-theme="default">
+            <h1>🎨 Portfolio Header Test</h1>
+            <p>This header should change colors when you click theme buttons below.</p>
+            <div class="current-theme" id="current-theme">Current: Default Theme</div>
+        </div>
+
+        <div>
+            <h3>🎨 Test Themes:</h3>
+            <button class="theme-button" onclick="changeTheme('default')">Default</button>
+            <button class="theme-button" onclick="changeTheme('sapphire')">Sapphire</button>
+            <button class="theme-button" onclick="changeTheme('emerald')">Emerald</button>
+            <button class="theme-button" onclick="changeTheme('sunset')">Sunset</button>
+            <button class="theme-button" onclick="changeTheme('royal')">Royal</button>
+            <button class="theme-button" onclick="changeTheme('aurora')">Aurora</button>
+        </div>
+
+        <div class="log" id="log">
+            [Ready] Click a theme button to test header changes...
+        </div>
+
+        <div class="status">
+            <h3>🔍 Expected Behavior:</h3>
+            <ul>
+                <li><strong>Default:</strong> Blue-Purple gradient</li>
+                <li><strong>Sapphire:</strong> Deep blue gradient</li>
+                <li><strong>Emerald:</strong> Green gradient</li>
+                <li><strong>Sunset:</strong> Orange-Red gradient</li>
+                <li><strong>Royal:</strong> Purple gradient</li>
+                <li><strong>Aurora:</strong> Cyan-Purple-Pink gradient</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'default';
+
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function changeTheme(theme) {
+            const header = document.getElementById('test-header');
+            const themeDisplay = document.getElementById('current-theme');
+            
+            log(`🎨 Changing theme from ${currentTheme} to ${theme}`);
+            
+            // Update data attribute
+            header.setAttribute('data-theme', theme);
+            
+            // Update display
+            themeDisplay.textContent = `Current: ${theme.charAt(0).toUpperCase() + theme.slice(1)} Theme`;
+            
+            // Log the change
+            log(`✅ Theme changed to ${theme}`);
+            log(`🎯 Header data-theme attribute: ${header.getAttribute('data-theme')}`);
+            
+            currentTheme = theme;
+            
+            // Simulate the event that would be fired by the real theme context
+            const themeEvent = new CustomEvent('themeChanged', {
+                detail: { theme, timestamp: Date.now() }
+            });
+            window.dispatchEvent(themeEvent);
+            log(`📢 Dispatched themeChanged event for ${theme}`);
+        }
+
+        // Listen for theme change events
+        window.addEventListener('themeChanged', (event) => {
+            log(`🔊 Received themeChanged event: ${event.detail.theme}`);
+        });
+
+        // Initial log
+        log('🚀 Header theme change test initialized');
+        log('💡 Click theme buttons to test header gradient changes');
+    </script>
+</body>
+</html>

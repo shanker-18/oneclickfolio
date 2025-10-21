@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test - Portfolio</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.reset {
+            background: #e53e3e;
+        }
+        .button.reset:hover {
+            background: #c53030;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            background: #eff6ff;
+        }
+        .success {
+            border-left-color: #10b981;
+            background: #ecfdf5;
+        }
+        .error {
+            border-left-color: #e53e3e;
+            background: #fef2f2;
+        }
+        .info {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .code {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Portfolio Theme Manager</h1>
+        <p>Use these tools to manage your portfolio theme settings:</p>
+        
+        <div class="info">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Click "Reset to Default Theme" to clear all settings</li>
+                <li>Go to your portfolio (refresh the page)</li>
+                <li>You should see a clean white background with black text</li>
+                <li>Test theme switching - it should persist and not revert</li>
+            </ol>
+        </div>
+
+        <h2>🔧 Theme Controls</h2>
+        <button class="button reset" onclick="resetToDefault()">Reset to Default Theme</button>
+        <button class="button" onclick="lockToDefault()">🔒 Lock to Default Theme</button>
+        <button class="button" onclick="unlockTheme()">🔓 Unlock Theme</button>
+        <button class="button" onclick="checkCurrentTheme()">Check Current Theme</button>
+        <button class="button" onclick="clearAllData()">Clear All Data</button>
+        
+        <div id="result"></div>
+        
+        <h2>📊 Current Settings</h2>
+        <div id="current-settings"></div>
+        
+        <h2>🔍 Debug Console</h2>
+        <div class="code" id="debug-log">
+            Click any button above to see debug information...
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const debugLog = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.innerHTML = `[${timestamp}] ${message}\n` + debugLog.innerHTML;
+        }
+
+        function showResult(message, type = 'result') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+
+        function resetToDefault() {
+            try {
+                // Clear theme-related localStorage
+                localStorage.removeItem('portfolio-theme-preferences');
+                localStorage.removeItem('portfolio-user-initialized');
+                localStorage.removeItem('customColors');
+                
+                // Set default theme explicitly
+                const defaultConfig = {
+                    theme: 'default',
+                    mode: 'light',
+                    template: 'modern',
+                    timestamp: Date.now(),
+                    isRandomlyAssigned: false,
+                    isFirstTime: true
+                };
+                
+                localStorage.setItem('portfolio-theme-preferences', JSON.stringify(defaultConfig));
+                localStorage.setItem('portfolio-user-initialized', 'true');
+                
+                log('✅ Reset to default theme: Clean Professional (white background, black text)');
+                showResult('✅ Theme reset to default! Go to your portfolio and refresh the page.', 'success');
+                updateCurrentSettings();
+            } catch (error) {
+                log('❌ Error resetting theme: ' + error.message);
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function checkCurrentTheme() {
+            try {
+                const preferences = localStorage.getItem('portfolio-theme-preferences');
+                const initialized = localStorage.getItem('portfolio-user-initialized');
+                
+                if (preferences) {
+                    const parsed = JSON.parse(preferences);
+                    log(`📊 Current theme: ${parsed.theme || 'unknown'}`);
+                    log(`📊 Current mode: ${parsed.mode || 'unknown'}`);
+                    log(`📊 Current template: ${parsed.template || 'unknown'}`);
+                    showResult(`Current theme: ${parsed.theme || 'unknown'} | Mode: ${parsed.mode || 'unknown'}`, 'result');
+                } else {
+                    log('📊 No theme preferences found - will use default');
+                    showResult('No theme preferences found - will use default theme', 'result');
+                }
+                
+                updateCurrentSettings();
+            } catch (error) {
+                log('❌ Error checking theme: ' + error.message);
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function lockToDefault() {
+            try {
+                // Set theme lock
+                localStorage.setItem('portfolio-theme-locked', 'default');
+                
+                // Force default theme
+                const defaultConfig = {
+                    theme: 'default',
+                    mode: 'light',
+                    template: 'modern',
+                    timestamp: Date.now(),
+                    isRandomlyAssigned: false,
+                    isLocked: true
+                };
+                
+                localStorage.setItem('portfolio-theme-preferences', JSON.stringify(defaultConfig));
+                localStorage.setItem('portfolio-user-initialized', 'true');
+                
+                log('🔒 Theme locked to default - no more switching!');
+                showResult('✅ Theme locked to default! Your portfolio will stay clean and professional.', 'success');
+                updateCurrentSettings();
+            } catch (error) {
+                log('❌ Error locking theme: ' + error.message);
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function unlockTheme() {
+            try {
+                localStorage.removeItem('portfolio-theme-locked');
+                log('🔓 Theme unlocked - you can now change themes');
+                showResult('✅ Theme unlocked! You can now change themes and templates.', 'success');
+                updateCurrentSettings();
+            } catch (error) {
+                log('❌ Error unlocking theme: ' + error.message);
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function clearAllData() {
+            try {
+                localStorage.clear();
+                log('🗑️ All localStorage data cleared');
+                showResult('All data cleared! Refresh your portfolio to see the default theme.', 'success');
+                updateCurrentSettings();
+            } catch (error) {
+                log('❌ Error clearing data: ' + error.message);
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function updateCurrentSettings() {
+            const settingsDiv = document.getElementById('current-settings');
+            const preferences = localStorage.getItem('portfolio-theme-preferences');
+            const initialized = localStorage.getItem('portfolio-user-initialized');
+            const customColors = localStorage.getItem('customColors');
+            const themeLocked = localStorage.getItem('portfolio-theme-locked');
+            
+            let html = '<ul>';
+            html += `<li><strong>User Initialized:</strong> ${initialized ? 'Yes' : 'No'}</li>`;
+            html += `<li><strong>Theme Locked:</strong> ${themeLocked ? `Yes (${themeLocked})` : 'No'}</li>`;
+            
+            if (preferences) {
+                try {
+                    const parsed = JSON.parse(preferences);
+                    html += `<li><strong>Theme:</strong> ${parsed.theme || 'unknown'}</li>`;
+                    html += `<li><strong>Mode:</strong> ${parsed.mode || 'unknown'}</li>`;
+                    html += `<li><strong>Template:</strong> ${parsed.template || 'unknown'}</li>`;
+                    html += `<li><strong>Randomly Assigned:</strong> ${parsed.isRandomlyAssigned ? 'Yes' : 'No'}</li>`;
+                    html += `<li><strong>First Time:</strong> ${parsed.isFirstTime ? 'Yes' : 'No'}</li>`;
+                    html += `<li><strong>Is Locked:</strong> ${parsed.isLocked ? 'Yes' : 'No'}</li>`;
+                } catch (e) {
+                    html += `<li><strong>Preferences:</strong> Invalid JSON</li>`;
+                }
+            } else {
+                html += `<li><strong>Preferences:</strong> Not set (will use default)</li>`;
+            }
+            
+            html += `<li><strong>Custom Colors:</strong> ${customColors ? 'Set' : 'Not set'}</li>`;
+            html += '</ul>';
+            
+            settingsDiv.innerHTML = html;
+        }
+
+        // Initialize display
+        updateCurrentSettings();
+        checkCurrentTheme();
+    </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+/* Portfolio Theme Transitions */
+.portfolio-header {
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.portfolio-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(31,41,55,0.9) 50%, rgba(0,0,0,0.8) 100%);
+  z-index: -1;
+}
+
+.portfolio-header.theme-transition {
+  transform: scale(1.01);
+  opacity: 0.95;
+}
+
+/* Enhanced header visibility */
+.portfolio-header h1 {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  font-weight: 700;
+}
+
+.portfolio-header p {
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Smooth loading animations */
+.portfolio-content {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Action buttons hover effects */
+.portfolio-actions .action-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio-actions .action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Section animations */
+.portfolio-section {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Certificate and achievement cards */
+.certificate-card,
+.achievement-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.certificate-card:hover,
+.achievement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Editor modal styles */
+.portfolio-editor {
+  animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Loading state improvements */
+.portfolio-loading {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dark .portfolio-loading {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .portfolio-actions {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .portfolio-actions .action-button {
+    padding: 0.75rem;
+  }
+  
+  .portfolio-editor {
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+/* Status badge animations */
+.status-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Smooth scrolling for portfolio navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for the editor */
+.portfolio-editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.portfolio-editor::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.portfolio-editor::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.portfolio-editor::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
