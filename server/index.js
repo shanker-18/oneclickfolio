@@ -15,6 +15,8 @@ const PORT = process.env.PORT || 5000;
 // CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://resume-dev-chi.vercel.app',
+  'https://resume-dev-manis-projects-3c91d416.vercel.app',
   'https://oneclickfolio-seven.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
@@ -84,13 +86,12 @@ if (!fs.existsSync(uploadsPath)) {
 }
 app.use('/uploads', express.static(uploadsPath));
 
-// Health check
+// Health check (both legacy and API-prefixed)
 app.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
+});
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Backend running fine on Vercel!' });
 });
 
 // Error handling middleware
@@ -111,12 +112,6 @@ app.use((req, res) => {
   });
 });
 
-// In Vercel serverless environment, export the handler instead of listening
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
-}
+// Do NOT call app.listen() in serverless (Vercel handles it)
 
 export default app;
