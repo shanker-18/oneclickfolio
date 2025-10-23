@@ -1,6 +1,6 @@
 // API Configuration
 const isDevelopment = import.meta.env.MODE === 'development';
-const isProduction = import.meta.env.PROD;
+const isProduction = import.meta.env.MODE === 'production';
 
 // Debug logging
 console.log('Environment MODE:', import.meta.env.MODE);
