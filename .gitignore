@@ -32,3 +32,5 @@ server/uploads/
 
 # Ignore accidental nested copy of this repo
 Resume-dev/
+
+.vercel
